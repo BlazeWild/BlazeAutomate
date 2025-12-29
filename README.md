@@ -1,36 +1,52 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# BlazeAutomate website (Next.js)
 
-## Getting Started
+Single-page marketing site for BlazeAutomate (Hero → Numbers → Why Us → Services → Contact + chat widget).
 
-First, run the development server:
+## Run locally
 
 ```bash
+cd web
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Then open http://localhost:3000
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Lead capture / GoHighLevel webhook
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The Contact form and Chat widget POST to `/api/lead`.
 
-## Learn More
+To forward leads to GoHighLevel (or any webhook), set:
 
-To learn more about Next.js, take a look at the following resources:
+- `GHL_WEBHOOK_URL` (server-side)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Example (PowerShell):
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```powershell
+cd web
+$env:GHL_WEBHOOK_URL = "https://your-webhook-url"
+npm run dev
+```
 
-## Deploy on Vercel
+## SEO / indexing
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `src/app/layout.tsx` sets title/description/OG/Twitter/canonical.
+- `src/app/sitemap.ts` generates `/sitemap.xml`.
+- `src/app/robots.ts` generates `/robots.txt`.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+For production, set:
+
+- `NEXT_PUBLIC_SITE_URL` (e.g. `https://yourdomain.com`)
+
+```powershell
+$env:NEXT_PUBLIC_SITE_URL = "https://yourdomain.com"
+```
+
+## Google Calendar embed
+
+The Contact section can show a Google Calendar booking embed.
+
+Set one or both:
+
+- `NEXT_PUBLIC_GOOGLE_CALENDAR_EMBED_URL` (iframe embed URL)
+- `NEXT_PUBLIC_GOOGLE_CALENDAR_APPOINTMENT_URL` (open-in-new-tab booking link)
