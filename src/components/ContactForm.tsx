@@ -55,29 +55,44 @@ export default function ContactForm() {
       return;
     }
 
+    // Honeypot check
+    if (form.honey) {
+      setStatus({ type: "success" });
+      return;
+    }
+
     setStatus({ type: "submitting" });
 
     try {
-      const res = await fetch("/api/lead", {
+      // Submit to GHL webhook or Web3Forms
+      const webhookUrl =
+        process.env.NEXT_PUBLIC_GHL_WEBHOOK_URL ||
+        "https://api.web3forms.com/submit";
+
+      const payload: Record<string, string> = {
+        name: form.name,
+        email: form.email,
+        phone: form.phone || "",
+        message: form.goals,
+        company: form.company || "",
+        website: form.website || "",
+        source: "BlazeAutomate Contact Form",
+      };
+
+      // Add Web3Forms access key if using their service (get free key at web3forms.com)
+      if (webhookUrl.includes("web3forms.com")) {
+        payload.access_key =
+          process.env.NEXT_PUBLIC_WEB3FORMS_KEY || "YOUR_WEB3FORMS_KEY_HERE";
+      }
+
+      const res = await fetch(webhookUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          source: "contact_form",
-          name: form.name,
-          email: form.email,
-          phone: form.phone,
-          message: form.goals,
-          company: form.company,
-          website: form.website,
-          honey: form.honey,
-        }),
+        body: JSON.stringify(payload),
       });
 
       if (!res.ok) {
-        const data = (await res.json().catch(() => null)) as {
-          error?: string;
-        } | null;
-        throw new Error(data?.error || "Could not send your inquiry.");
+        throw new Error("Could not send your inquiry.");
       }
 
       setStatus({ type: "success" });
